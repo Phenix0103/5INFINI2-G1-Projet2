@@ -63,7 +63,7 @@ pipeline {
                         currentBuild.result = 'FAILURE'
                         error "Échec du déploiement de l'image Docker"
                         mail(
-                            to: 'cyrine.chouchane@esprit.tn',
+                            to: 'chouchanecyrine@gmail.com',
                             subject: 'Erreur dans le pipeline Jenkins',
                             body: "Une erreur s'est produite dans le pipeline Jenkins.\nDétails de l'erreur : ${err}"
                         )
