@@ -51,15 +51,15 @@ pipeline {
                 }
             } 
         }
-         stage('Deploy image') { 
-            steps { 
-                script { 
-                    docker.withRegistry( '', registryCredential ) { 
-                        dockerImage.push() 
-                    }
-                } 
+         stage('Docker PUSH image') {
+            steps {
+                //sh 'docker login -u lindabelhadj -p dock@hello123!!Lin'
+                //sh 'docker push lindabelhadj/kaddem:1-0'
+                echo "Deploying the image..."
+                sh 'docker login -u ceceyphoenix -p dock@hello123!!Lin docker.io'
+                sh 'docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} '
             }
-        } 
+        }
         stage('docker-compose') {
             steps {
                 sh 'docker compose up -d'
