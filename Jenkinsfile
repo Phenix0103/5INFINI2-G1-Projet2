@@ -1,5 +1,13 @@
 pipeline {
-     
+     environment { 
+
+        registry = "ceceyphoenix/projetdevops" 
+
+        registryCredential = 'ceceyphoenix' 
+
+        dockerImage = '' 
+
+    }
     agent any
     tools {
         maven 'M2_HOME'
@@ -36,51 +44,38 @@ pipeline {
                  sh 'mvn deploy';
             }
         }
-  stage('Docker') {
-            steps {
-                script {
-                    // Build the Docker image with Jenkins BUILD_NUMBER as the version
-                    sh 'docker build -t kaddemimage:v${BUILD_NUMBER} -f Dockerfile ./'
-                    
-                    // Tagging the Docker image for Docker Hub
-                    sh 'docker tag kaddemimage:v${BUILD_NUMBER} ceceyphoenix/projetdevops:v${BUILD_NUMBER}'
-
-                    // Login to Docker Hub (Ensure Docker Hub credentials are configured in Jenkins)
-                    // The 'dockerhubcredentials' should be the ID of your Docker Hub credentials stored in Jenkins
-                    sh 'docker login --username ceceyphoenix --password Princesseflora1'
-                    
-                    // Push the Docker image to Docker Hub
-                    sh 'docker push ceceyphoenix/projetdevops:v${BUILD_NUMBER}'
-                    
-                    // Run Docker Compose
-                    sh "IMAGE_VERSION=v${BUILD_NUMBER} docker compose up -d"
+   stage('Building image') { 
+            steps { 
+                script { 
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
                 }
+            } 
+        }
+         stage('Deploy image') { 
+            steps { 
+                script { 
+                    try {
+                        docker.withRegistry( '', registryCredential ) { 
+                            dockerImage.push() 
+                        }
+                    } catch (err) {
+                        echo "Erreur lors du déploiement de l'image Docker : ${err}"
+                        currentBuild.result = 'FAILURE'
+                        error "Échec du déploiement de l'image Docker"
+                        mail(
+                            to: 'chouchanecyrine@gmail.com',
+                            subject: 'Erreur dans le pipeline Jenkinss',
+                            body: "Une erreur s'est produite dans le pipeline Jenkins.\nDétails de l'erreur : ${err}"
+                        )
+                    }
+                } 
+            }
+        } 
+        stage('docker-compose') {
+            steps {
+                sh 'docker compose up -d'
             }
         }
-    }
-    post {
-        success {
-            mail to: 'chouchanecyrine@gmail.com',
-                 subject: "SUCCESS: Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "The pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully."
-        }
-        failure {
-            mail to: 'chouchanecyrine@gmail.com',
-                 subject: "FAILURE: Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "The pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} failed."
-        }
-        unstable {
-            mail to: 'chouchanecyrine@gmail.com',
-                 subject: "UNSTABLE: Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "The pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} is unstable."
-        }
-        aborted {
-            mail to: 'chouchanecyrine@gmail.com',
-                 subject: "ABORTED: Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "The pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} was aborted."
-        }
-    }
-        
           stage('Grafana') {
             steps {
                 sh 'docker compose up -d'
