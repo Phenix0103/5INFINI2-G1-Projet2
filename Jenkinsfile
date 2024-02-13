@@ -1,7 +1,7 @@
 pipeline {
      environment { 
 
-        registry = "ceceyphoenix/projetdevops" 
+        registry = "ceceyphoenix/Cyrine" 
 
         registryCredential = 'ceceyphoenix' 
 
@@ -16,7 +16,7 @@ pipeline {
         stage('GIT') {
             steps {
                 git branch: 'cyrine-chouchane',
-                url: 'https://github.com/azizjaziri48/5INFINI2-G1-Projet2.git'
+                url: 'https://github.com/Phenix0103/5INFINI2-G1-Projet2.git'
             }
         }
         stage('MVN CLEAN') {
