@@ -1,7 +1,7 @@
 pipeline {
      environment { 
 
-        registry = "ceceyphoenix/Cyrine" 
+        registry = "ceceyphoenix/projetdevops" 
 
         registryCredential = 'ceceyphoenix' 
 
