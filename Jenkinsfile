@@ -51,15 +51,21 @@ pipeline {
                 }
             } 
         }
-         stage('Docker PUSH image') {
-            steps {
-                //sh 'docker login -u lindabelhadj -p dock@hello123!!Lin'
-                //sh 'docker push lindabelhadj/kaddem:1-0'
-                echo "Deploying the image..."
-                sh 'docker login -u ceceyphoenix -p Princesseflora1 docker.io'
-                sh 'docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} '
+         stage('Deploy image') { 
+            steps { 
+                script { 
+                    try {
+                        docker.withRegistry( '', registryCredential ) { 
+                            dockerImage.push() 
+                        }
+                    } catch (err) {
+                        echo "Erreur lors du déploiement de l'image Docker : ${err}"
+                        currentBuild.result = 'FAILURE'
+                        error "Échec du déploiement de l'image Docker"
+                    }
+                } 
             }
-        }
+        } 
         stage('docker-compose') {
             steps {
                 sh 'docker compose up -d'
