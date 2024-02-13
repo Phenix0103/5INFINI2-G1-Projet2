@@ -62,6 +62,11 @@ pipeline {
                         echo "Erreur lors du déploiement de l'image Docker : ${err}"
                         currentBuild.result = 'FAILURE'
                         error "Échec du déploiement de l'image Docker"
+                        mail(
+                            to: 'votre@email.com',
+                            subject: 'Erreur dans le pipeline Jenkins',
+                            body: "Une erreur s'est produite dans le pipeline Jenkins.\nDétails de l'erreur : ${err}"
+                        )
                     }
                 } 
             }
@@ -71,11 +76,11 @@ pipeline {
                 sh 'docker compose up -d'
             }
         }
-         /* stage('Grafana') {
+          stage('Grafana') {
             steps {
                 sh 'docker compose up -d'
             }
-        }*/
+        }
          
     }
 }
