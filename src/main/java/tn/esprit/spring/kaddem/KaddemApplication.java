@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @SpringBootApplication
 public class KaddemApplication {
-    //test jenkinsfile
+    //test jenkinsfile 2
     public static void main(String[] args) {
         SpringApplication.run(KaddemApplication.class, args);
     }
